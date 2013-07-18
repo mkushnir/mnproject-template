@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <syslog.h>
 
-#include "foo.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
+#include <foo.h>
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/util.h>
 
 char message[BUFLEN];
 

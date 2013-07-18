@@ -3,8 +3,8 @@
 #include <time.h>
 
 #include "unittest.h"
-#include "mrkcommon/dumpm.h"
-#include "mrkcommon/util.h"
+#include <mrkcommon/dumpm.h>
+#include <mrkcommon/util.h>
 
 #ifndef NDEBUG
 const char *_malloc_options = "AJ";
