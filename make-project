@@ -187,6 +187,8 @@ then
     CC="clang -Qunused-arguments -fcolor-diagnostics"
     CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
     CPP="clang -E"
+else
+    CLANG_DEBUG='-ftrapv -fcatch-undefined-behavior'
 fi
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -263,7 +265,7 @@ ${canonical_pname}_SOURCES = foo.c $_MNAME
 nodist_${canonical_pname}_SOURCES = diag.c
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 -ftrapv -fcatch-undefined-behavior
+    DEBUG_FLAGS = -g -O0 \$(CLANG_DEBUG)
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
@@ -299,7 +301,7 @@ BUILT_SOURCES = ../diag.c ../diag.h
 ${_TEST_LIB_HEADERS}
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 -ftrapv -fcatch-undefined-behavior
+    DEBUG_FLAGS = -g -O0 \$(CLANG_DEBUG)
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
