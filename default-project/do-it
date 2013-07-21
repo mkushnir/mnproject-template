@@ -13,7 +13,6 @@ then
     make distclean
     autoreconf
     ./configure --prefix=$HOME --enable-debug
-    make
 elif test "$1" = "dev"
 then
     export LDFLAGS=-L$HOME/lib
