@@ -91,6 +91,7 @@ then
     _AM_PROG="lib_LTLIBRARIES = lib${pname}.la"
     _LIB_HEADERS="nobase_include_HEADERS = $pname.h"
     _TEST_LIB_HEADERS="noinst_HEADERS = ../$pname.h"
+    _TESTFOO_LDFLAGS="-l$pname"
     rm "$pname/src/main.c"
     touch $pname/src/$pname.c $pname/src/$pname.h $pname/src/${pname}_private.h
     for i in $pname/src/$pname.h $pname/src/${pname}_private.h
@@ -247,7 +248,7 @@ cat <<EOD >$pname/src/Makefile.am
 AUTOMAKE_OPTIONS = foreign
 
 distdir = ../\$(PACKAGE)-\$(VERSION)/src
-dist_HEADERS = ${pname}_private.h
+dist_HEADERS =
 
 BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = diag.txt gen-diag
@@ -308,7 +309,7 @@ endif
 nodist_testfoo_SOURCES = ../diag.c
 testfoo_SOURCES = testfoo.c
 testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I\$(includedir)
-testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon -l${pname}
+testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon ${_TESTFOO_LDFLAGS}
 
 ../diag.c ../diag.h: ../diag.txt
 	sh ../gen-diag
