@@ -78,6 +78,7 @@ fi
 ( cd $pname && tar -cvz -f- -C ../default-project . | tar -xvz -f- )
 
 #cp -R default-project "$pname";
+symbol_pname=`echo $pname | sed -e 's/[^a-zA-Z0-9_]/_/g'`
 
 if test "$type" = "lib"
 then
@@ -106,6 +107,7 @@ then
 extern "C" {
 #endif
 
+const char *${symbol_pname}_diag_str(int);
 
 
 #ifdef __cplusplus
@@ -310,7 +312,7 @@ ${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
 SUBDIRS = . test
 
 diag.c diag.h: diag.txt
-	sh ./gen-diag
+	sh ./gen-diag $symbol_pname
 
 run: all
 	for i in \$(bin_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -345,7 +347,7 @@ testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I.. -I\$(includ
 testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon ${_TESTFOO_LDFLAGS}
 
 ../diag.c ../diag.h: ../diag.txt
-	sh ../gen-diag
+	sh ../gen-diag $symbol_pname
 
 testrun: all
 	for i in \$(noinst_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -400,6 +402,3 @@ fi
 echo "Project $pname created -- OK";
 
 exit 0;
-
-
-

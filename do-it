@@ -1,0 +1,13 @@
+#!/bin/sh
+
+if test "$1" = "init"
+then
+elif test "$1" = "dev"
+then
+elif test "$1" = "dev-ndebug"
+then
+elif test "$1" = "dist"
+then
+else
+    echo "`basename $0` {init|dev|dist|dev-ndebug}"
+fi
