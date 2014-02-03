@@ -228,7 +228,7 @@ fi
 
 AC_CONFIG_MACRO_DIR([m4])
 
-#AC_LANG(C)
+AC_LANG(C)
 
 AC_PROG_CC
 AC_PROG_CXX
@@ -300,7 +300,7 @@ ${canonical_pname}_SOURCES = foo.c $_MNAME
 nodist_${canonical_pname}_SOURCES = diag.c
 
 if DEBUG
-    DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
+DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
