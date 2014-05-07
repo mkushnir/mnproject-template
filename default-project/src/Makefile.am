@@ -1,4 +1,4 @@
-AUTOMAKE_OPTIONS = foreign
+AUTOMAKE_OPTIONS = foreign subdir-objects
 bin_PROGRAMS=hello
 hello_SOURCES=hello.c
 hello_CFLAGS=-Wall -Werror -std=c99 -I/usr/local/include

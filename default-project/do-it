@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# On Linux: apt-get install autotools-dev autoconf libtool
+#
 if test "$1" = "init"
 then
     export LDFLAGS=-L$HOME/lib
@@ -40,7 +42,7 @@ then
     fi
     for i in *.tar.gz
     do
-        cp -v $i /data0/mkushnir/distfiles/
+        cp -v $i /data2/mkushnir/distfiles/
         if test -f port/distinfo
         then
             /sbin/sha256 $i >port/distinfo
