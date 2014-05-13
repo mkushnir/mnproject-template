@@ -184,7 +184,7 @@ testrun:
 EOD
 
 cat <<EOD >$pname/configure.ac
-AC_INIT($pname, 0.1, markiyan.kushnir@gmail.com)
+AC_INIT($pname, 0.1, markiyan.kushnir@gmail.com, $pname, https://github.com/mkushnir)
 if test -n "\$USE_GCC"
 then
     probe="gcc\${USE_GCC}"
