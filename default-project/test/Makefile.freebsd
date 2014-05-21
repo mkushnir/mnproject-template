@@ -1,6 +1,6 @@
 PROGS=test-foo
 
-OBJS=../dumpm.o ../diag.o
+OBJS=../src/dumpm.o ../src/diag.o
 
 .for i in ${PROGS}
 PROGOBJS+= ${i}.o
