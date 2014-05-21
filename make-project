@@ -91,7 +91,7 @@ then
     canonical_pname="lib${pname}.la"
     _AM_PROG="lib_LTLIBRARIES = lib${pname}.la"
     _LIB_HEADERS="nobase_include_HEADERS = $pname.h"
-    _TEST_LIB_HEADERS="noinst_HEADERS = ../$pname.h"
+    _TEST_LIB_HEADERS="noinst_HEADERS = ../src/$pname.h"
     _TESTFOO_LDFLAGS="-l$pname"
     rm "$pname/src/main.c"
     touch $pname/src/$pname.c $pname/src/$pname.h $pname/src/${pname}_private.h
