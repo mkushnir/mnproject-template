@@ -1,10 +1,6 @@
 #include <assert.h>
-#include <stdlib.h>
-#include <time.h>
 
 #include "unittest.h"
-#include <mrkcommon/dumpm.h>
-#include <mrkcommon/util.h>
 
 #ifndef NDEBUG
 const char *_malloc_options = "AJ";
@@ -23,7 +19,7 @@ test0(void)
     UNITTEST_PROLOG_RAND;
 
     FOREACHDATA {
-        TRACE("in=%d expected=%d", CDATA.in, CDATA.expected);
+        //TRACE("in=%d expected=%d", CDATA.in, CDATA.expected);
         assert(CDATA.in == CDATA.expected);
     }
 }

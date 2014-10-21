@@ -1,7 +1,12 @@
 #ifndef UNITTEST_H
 #define UNITTEST_H
 
-#include "mrkcommon/util.h"
+#include <stdlib.h>
+#include <time.h>
+//#include "mrkcommon/util.h"
+#ifndef countof
+#   define countof(a) (sizeof(a)/sizeof(a[0]))
+#endif
 
 #ifdef __cplusplus
 extern "C" {
