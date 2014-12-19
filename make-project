@@ -107,9 +107,6 @@ then
 extern "C" {
 #endif
 
-const char *${symbol_pname}_diag_str(int);
-
-
 #ifdef __cplusplus
 }
 #endif
