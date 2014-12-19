@@ -22,6 +22,7 @@ echo '#define DIAG_CLASS_SHL 16' >> diag.h
 echo 'struct _diag_entry_st {int cls; const char *fmt;};' >> diag.h
 echo 'const char *diag_str(int);' >> diag.h
 echo "int ${1}_diag_class(unsigned, unsigned);" >> diag.h
+echo "const char *${1}_diag_str(int);" >> diag.h
 echo '#define FAIL(s) do { perror(s); abort(); } while (0)' >> diag.h
 
 
