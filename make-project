@@ -263,6 +263,9 @@ AC_ARG_ENABLE(debug,
               [AM_CONDITIONAL([DEBUG], [enable_debug=yes])],
               [AM_CONDITIONAL([DEBUG], [test "\$enable_debug" = "yes"])])
 
+AM_CONDITIONAL([LINUX], [echo \$build_os | grep linux >/dev/null])
+AM_CONDITIONAL([FREEBSD], [echo \$build_os | grep freebsd >/dev/null])
+
 #dnl pass LDFLAGS=-L\${LOCALBASE}/lib in the environment
 #AC_CHECK_LIB(mrkcommon, _fini, [], [AC_MSG_FAILURE(libmrkcommon.so is required. Please find it at git@github.com:mkushnir/mrkcommon.git)])
 
@@ -315,7 +318,7 @@ ${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
 SUBDIRS = .
 
 diag.c diag.h: diag.txt
-	sh ./gen-diag $symbol_pname
+	$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
 
 run: all
 	for i in \$(bin_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -339,7 +342,7 @@ BUILT_SOURCES = ../src/diag.c ../src/diag.h
 ${_TEST_LIB_HEADERS}
 
 if DEBUG
-    DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
+DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
@@ -351,7 +354,7 @@ testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I\$(includedir)
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
-	sh ../src/gen-diag $symbol_pname
+	$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
 
 testrun: all
 	for i in \$(noinst_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
