@@ -310,7 +310,7 @@ else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
 
-${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I\$(includedir) -I\$(top_srcdir) -I\$(top_srcdir)/src
+${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 
 #${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
 ${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
@@ -349,7 +349,7 @@ endif
 
 nodist_testfoo_SOURCES = ../src/diag.c
 testfoo_SOURCES = testfoo.c
-testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I\$(includedir) -I\$(top_srcdir) -I\$(top_srcdir)/src
+testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 #testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon ${_TESTFOO_LDFLAGS}
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
