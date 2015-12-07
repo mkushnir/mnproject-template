@@ -313,7 +313,7 @@ ${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
 SUBDIRS = .
 
 diag.c diag.h: diag.txt
-	$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
+	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
 
 run: all
 	for i in \$(bin_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -349,7 +349,7 @@ testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 -I\$(top_srcdir)
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
 ../src/diag.c ../src/diag.h: ../src/diag.txt
-	$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
+	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
 
 testrun: all
 	for i in \$(noinst_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
