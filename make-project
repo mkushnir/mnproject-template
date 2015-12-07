@@ -207,22 +207,17 @@ else
         CC="clang -Qunused-arguments -fcolor-diagnostics"
         CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
         CPP="clang-cpp"
-        clang_version=\`clang --version | grep version | awk '{print \$4;}'\`
-        clang_version_mjr=\`echo \$clang_version | awk -F. '{print \$1;}'\`
-        clang_version_mnr=\`echo \$clang_version | awk -F. '{print \$2;}'\`
-        if test "\$clang_version_mjr" = "3" -a "\$clang_version_mnr" -lt 3
-        then
-            AC_SUBST(CLANG_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
-        else
-            # we assume all others are 3.3+, add here options if needed
-            AC_SUBST(CLANG_DEBUG, ['-ftrapv'])
-        fi
+        #clang_version=\`clang --version | grep version | awk '{print \$4;}'\`
+        #clang_version_mjr=\`echo \$clang_version | awk -F. '{print \$1;}'\`
+        #clang_version_mnr=\`echo \$clang_version | awk -F. '{print \$2;}'\`
     else
         CC="cc"
         CXX="c++"
         CPP="cpp"
     fi
 fi
+
+AC_SUBST(CC_DEBUG, ['-ftrapv'])
 
 uname_s=\`uname -s\`
 if test "\$uname_s" = "Linux"
@@ -305,7 +300,7 @@ ${canonical_pname}_SOURCES = $_MNAME
 nodist_${canonical_pname}_SOURCES = diag.c
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
+DEBUG_FLAGS = -g -O0 @CC_DEBUG@
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
@@ -342,7 +337,7 @@ BUILT_SOURCES = ../src/diag.c ../src/diag.h
 ${_TEST_LIB_HEADERS}
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 @CLANG_DEBUG@
+DEBUG_FLAGS = -g -O0 @CC_DEBUG@
 else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
