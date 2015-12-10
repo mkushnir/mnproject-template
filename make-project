@@ -291,6 +291,7 @@ BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = diag.txt gen-diag
 CLEANFILES = \$(BUILT_SOURCES) *.core
 #CLEANFILES += *.in
+AM_MAKEFLAGS = -s
 
 ${_AM_PROG}
 
@@ -328,6 +329,7 @@ cat <<EOD >$pname/test/Makefile.am
 AUTOMAKE_OPTIONS = foreign subdir-objects
 CLEANFILES = *.core
 #CLEANFILES += *.in
+AM_MAKEFLAGS = -s
 
 noinst_PROGRAMS=testfoo
 
