@@ -6,34 +6,35 @@ if test "$1" = "init"
 then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
-    aclocal
-    autoheader
-    autoreconf
-    automake --add-missing
-    libtoolize
-    make distclean
-    autoreconf
+    autoreconf --force --install
+    #aclocal
+    #autoheader
+    #autoreconf
+    #automake --add-missing
+    #libtoolize
+    #make distclean
+    #autoreconf
     ./configure --prefix=$HOME --enable-debug
 
 elif test "$1" = "dev"
 then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
-    autoreconf
+    autoreconf --force
     ./configure --prefix=$HOME --enable-debug
 
 elif test "$1" = "dev-ndebug"
 then
     export LDFLAGS=-L$HOME/lib
     export CFLAGS=-I$HOME/include
-    autoreconf
+    autoreconf --force
     ./configure --prefix=$HOME
 
 elif test "$1" = "dist"
 then
     unset LDFLAGS
     unset CFLAGS
-    autoreconf
+    autoreconf --force
     ./configure
 
     if test -d port
