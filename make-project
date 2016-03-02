@@ -80,16 +80,6 @@ fi
 #cp -R default-project "$pname";
 symbol_pname=`echo $pname | sed -e 's/[^a-zA-Z0-9_]/_/g'`
 
-#
-# consider headers:
-#   - include_HEADERS
-#   - nobase_include_HEADERS
-#   - pkginclude_HEADERS
-#   - dist_HEADERS
-#   - nodist_HEADERS
-#   - noinst_HEADERS
-#
-#
 if test "$type" = "lib"
 then
     _PTYPE=LIB
@@ -293,6 +283,13 @@ EOD
 
 cat <<EOD >$pname/src/Makefile.am
 distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/src
+# consider headers:
+#   - include_HEADERS
+#   - nobase_include_HEADERS
+#   - pkginclude_HEADERS
+#   - dist_HEADERS
+#   - nodist_HEADERS
+#   - noinst_HEADERS
 dist_HEADERS =
 
 BUILT_SOURCES = diag.c diag.h
@@ -338,10 +335,17 @@ CLEANFILES = *.core core
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
 
-noinst_PROGRAMS=testfoo
-
 distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/test
+# consider headers:
+#   - include_HEADERS
+#   - nobase_include_HEADERS
+#   - pkginclude_HEADERS
+#   - dist_HEADERS
+#   - nodist_HEADERS
+#   - noinst_HEADERS
 dist_HEADERS = unittest.h
+
+noinst_PROGRAMS=testfoo
 
 BUILT_SOURCES = ../src/diag.c ../src/diag.h
 
