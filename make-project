@@ -80,6 +80,16 @@ fi
 #cp -R default-project "$pname";
 symbol_pname=`echo $pname | sed -e 's/[^a-zA-Z0-9_]/_/g'`
 
+#
+# consider headers:
+#   - include_HEADERS
+#   - nobase_include_HEADERS
+#   - pkginclude_HEADERS
+#   - dist_HEADERS
+#   - nodist_HEADERS
+#   - noinst_HEADERS
+#
+#
 if test "$type" = "lib"
 then
     _PTYPE=LIB
@@ -238,7 +248,7 @@ AC_PROG_RANLIB
 AC_PROG_INSTALL
 
 LT_INIT
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([foreign subdir-objects])
 AM_SILENT_RULES([yes])
 
 dnl AM_MAINTAINER_MODE
@@ -282,8 +292,6 @@ testrun:
 EOD
 
 cat <<EOD >$pname/src/Makefile.am
-AUTOMAKE_OPTIONS = foreign subdir-objects
-
 distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/src
 dist_HEADERS =
 
@@ -326,7 +334,6 @@ testrun:
 EOD
 
 cat <<EOD >$pname/test/Makefile.am
-AUTOMAKE_OPTIONS = foreign subdir-objects
 CLEANFILES = *.core core
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
