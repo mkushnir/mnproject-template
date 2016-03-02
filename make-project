@@ -347,7 +347,8 @@ dist_HEADERS = unittest.h
 
 noinst_PROGRAMS=testfoo
 
-BUILT_SOURCES = ../src/diag.c ../src/diag.h
+BUILT_SOURCES = diag.c diag.h
+EXTRA_DIST = diag.txt gen-diag
 
 ${_TEST_LIB_HEADERS}
 
@@ -357,13 +358,13 @@ else
 DEBUG_FLAGS = -DNDEBUG -O3
 endif
 
-nodist_testfoo_SOURCES = ../src/diag.c
+nodist_testfoo_SOURCES = diag.c
 testfoo_SOURCES = testfoo.c
-testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 #testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon ${_TESTFOO_LDFLAGS}
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
-../src/diag.c ../src/diag.h: ../src/diag.txt
+diag.c diag.h: diag.txt
 	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
 
 testrun: all
