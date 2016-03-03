@@ -348,7 +348,7 @@ dist_HEADERS = unittest.h
 noinst_PROGRAMS=testfoo
 
 BUILT_SOURCES = diag.c diag.h
-EXTRA_DIST = diag.txt gen-diag
+EXTRA_DIST = diag.txt gen-diag runscripts
 
 ${_TEST_LIB_HEADERS}
 
