@@ -315,8 +315,10 @@ endif
 
 ${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 
-#${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
-${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
+${canonical_pname}_LDADD = ${_VERSIONINFO}
+#${canonical_pname}_LDADD = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
+#${canonical_pname}_LDFLAGS = -all-static
+#${canonical_pname}_LDFLAGS = -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
 
 SUBDIRS = .
 
