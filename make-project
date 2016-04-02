@@ -162,7 +162,7 @@ CXX=clang++
 CPP=clang-cpp
 .endif
 
-diag.c diag.h: diag.txt
+diag.c diag.h: diag.txt gen-diag
 	sh ./gen-diag
 
 .include <bsd.$_BSD.mk>
@@ -325,7 +325,7 @@ ${canonical_pname}_LDADD = ${_VERSIONINFO}
 
 SUBDIRS = .
 
-diag.c diag.h: diag.txt
+diag.c diag.h: diag.txt gen-diag
 	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
 
 run: all
@@ -352,7 +352,7 @@ dist_HEADERS = unittest.h
 
 noinst_PROGRAMS=testfoo
 
-BUILT_SOURCES = diag.c diag.h
+BUILT_SOURCES = diag.c diag.h gen-diag
 EXTRA_DIST = diag.txt gen-diag runscripts
 
 ${_TEST_LIB_HEADERS}
@@ -369,7 +369,7 @@ testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MAC
 #testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon ${_TESTFOO_LDFLAGS}
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
-diag.c diag.h: diag.txt
+diag.c diag.h: diag.txt gen-diag
 	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
 
 testrun: all
