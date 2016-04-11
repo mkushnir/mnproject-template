@@ -348,7 +348,7 @@ distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/test
 #   - dist_HEADERS
 #   - nodist_HEADERS
 #   - noinst_HEADERS
-noinst_HEADERS = unittest.h
+dist_HEADERS = unittest.h
 
 noinst_PROGRAMS=testfoo
 
