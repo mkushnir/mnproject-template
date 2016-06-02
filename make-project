@@ -91,7 +91,7 @@ then
     canonical_pname="lib${pname}.la"
     _AM_PROG="lib_LTLIBRARIES = lib${pname}.la"
     _LIB_HEADERS="nobase_include_HEADERS = $pname.h"
-    _TEST_LIB_HEADERS="noinst_HEADERS = ../src/$pname.h"
+    _TEST_LIB_HEADERS="#noinst_HEADERS = ../src/$pname.h"
     _TESTFOO_LDFLAGS="-L\$(top_srcdir)/src/.libs -l$pname"
     rm "$pname/src/main.c"
     touch $pname/src/$pname.c $pname/src/$pname.h $pname/src/${pname}_private.h
@@ -117,7 +117,7 @@ else
     canonical_pname=$pname
     _AM_PROG="bin_PROGRAMS = $pname"
     _LIB_HEADERS="nobase_include_HEADERS ="
-    _TEST_LIB_HEADERS="noinst_HEADERS ="
+    _TEST_LIB_HEADERS="#noinst_HEADERS ="
 fi
 
 canonical_pname=`echo $canonical_pname | sed -e 's/[^a-zA-Z0-9_]/_/g'`
@@ -271,7 +271,6 @@ AC_OUTPUT
 EOD
 
 cat <<EOD >$pname/Makefile.am
-distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)
 SUBDIRS = src man test
 #CLEANFILES = *.in *.m4 *.log *.scan configure
 ACLOCAL_AMFLAGS = '-Im4'
@@ -285,7 +284,6 @@ testrun:
 EOD
 
 cat <<EOD >$pname/src/Makefile.am
-distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/src
 # consider headers:
 #   - include_HEADERS
 #   - nobase_include_HEADERS
@@ -293,7 +291,6 @@ distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/src
 #   - dist_HEADERS
 #   - nodist_HEADERS
 #   - noinst_HEADERS
-dist_HEADERS =
 
 BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = diag.txt gen-diag
@@ -304,8 +301,6 @@ AM_MAKEFLAGS = -s
 ${_AM_PROG}
 
 ${_LIB_HEADERS}
-
-noinst_HEADERS =
 
 ${canonical_pname}_SOURCES = $_MNAME
 nodist_${canonical_pname}_SOURCES = diag.c
@@ -318,12 +313,10 @@ endif
 
 ${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 
-${canonical_pname}_LDADD = ${_VERSIONINFO}
-#${canonical_pname}_LDADD = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
+${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
+#${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
 #${canonical_pname}_LDFLAGS = -all-static
 #${canonical_pname}_LDFLAGS = -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
-
-SUBDIRS = .
 
 diag.c diag.h: diag.txt gen-diag
 	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
@@ -340,7 +333,6 @@ CLEANFILES = *.core core
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
 
-distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/test
 # consider headers:
 #   - include_HEADERS
 #   - nobase_include_HEADERS
@@ -348,7 +340,7 @@ distdir = \$(top_srcdir)/\$(PACKAGE)-\$(VERSION)/test
 #   - dist_HEADERS
 #   - nodist_HEADERS
 #   - noinst_HEADERS
-dist_HEADERS = unittest.h
+noinst_HEADERS = unittest.h
 
 noinst_PROGRAMS=testfoo
 
