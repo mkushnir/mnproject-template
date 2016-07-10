@@ -4,9 +4,10 @@
 #
 if test "$1" = "init"
 then
-    export LDFLAGS=-L$HOME/lib
-    export CFLAGS=-I$HOME/include
-    autoreconf --force --install
+    export LDFLAGS="-L$HOME/lib -L/usr/local/lib"
+    export CFLAGS="-I$HOME/include -I /usr/local/include"
+    #autoreconf --force --install
+    autoreconf --force
     #aclocal
     #autoheader
     #autoreconf
@@ -18,8 +19,8 @@ then
 
 elif test "$1" = "dev"
 then
-    export LDFLAGS=-L$HOME/lib
-    export CFLAGS=-I$HOME/include
+    export LDFLAGS="-L$HOME/lib -L/usr/local/lib"
+    export CFLAGS="-I$HOME/include -I /usr/local/include"
     autoreconf --force
     ./configure --prefix=$HOME --enable-debug
 
