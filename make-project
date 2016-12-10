@@ -103,6 +103,15 @@ then
 #ifndef ${nn}_DEFINED
 #define ${nn}_DEFINED
 
+#include <limits.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stddef.h>
+#include <stdint.h>
+
+#include <stdlib.h>
+#include <stdio.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -293,7 +302,7 @@ cat <<EOD >$pname/src/Makefile.am
 #   - noinst_HEADERS
 
 BUILT_SOURCES = diag.c diag.h
-EXTRA_DIST = diag.txt gen-diag
+EXTRA_DIST = \$(diags) gen-diag
 CLEANFILES = \$(BUILT_SOURCES) *.core core
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
@@ -304,6 +313,8 @@ ${_LIB_HEADERS}
 
 ${canonical_pname}_SOURCES = $_MNAME
 nodist_${canonical_pname}_SOURCES = diag.c
+
+diags = diag.txt
 
 if DEBUG
 DEBUG_FLAGS = -g -O0 @CC_DEBUG@
@@ -318,8 +329,8 @@ ${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
 #${canonical_pname}_LDFLAGS = -all-static
 #${canonical_pname}_LDFLAGS = -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
 
-diag.c diag.h: diag.txt gen-diag
-	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
+diag.c diag.h: \$(diags) gen-diag
+	\$(AM_V_GEN) cat \$(diags) | sort -u | ./gen-diag $symbol_pname
 
 run: all
 	for i in \$(bin_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -345,9 +356,11 @@ noinst_HEADERS = unittest.h
 noinst_PROGRAMS=testfoo
 
 BUILT_SOURCES = diag.c diag.h gen-diag
-EXTRA_DIST = diag.txt gen-diag runscripts
+EXTRA_DIST = \$(diags) gen-diag runscripts
 
 ${_TEST_LIB_HEADERS}
+
+diags = diag.txt
 
 if DEBUG
 DEBUG_FLAGS = -g -O0 @CC_DEBUG@
@@ -361,8 +374,14 @@ testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MAC
 #testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon ${_TESTFOO_LDFLAGS}
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
-diag.c diag.h: diag.txt gen-diag
-	\$(AM_V_GEN) /bin/sh ./gen-diag $symbol_pname
+diag.c diag.h: \$(diags) gen-diag
+	\$(AM_V_GEN) cat \$(diags) | sort -u | ./gen-diag $symbol_pname
+
+testfoo-run: testfoo
+	@if test -x $>; \\
+	    then LD_LIBRARY_PATH=\$(libdir) ./$> \$\${\$(>)_ARGS}; \\
+	    else true; \\
+	fi
 
 testrun: all
 	for i in \$(noinst_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;

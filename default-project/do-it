@@ -8,13 +8,13 @@ then
     export CFLAGS="-I$HOME/include -I /usr/local/include"
     #autoreconf --force --install
     autoreconf --force
-    #aclocal
-    #autoheader
-    #autoreconf
-    #automake --add-missing
-    #libtoolize
-    #make distclean
-    #autoreconf
+    aclocal
+    autoheader
+    autoreconf
+    automake --add-missing
+    libtoolize
+    make distclean
+    autoreconf
     ./configure --prefix=$HOME --enable-debug
 
 elif test "$1" = "dev"

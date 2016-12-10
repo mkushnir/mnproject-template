@@ -31,8 +31,8 @@ echo '#include <stdio.h>' >> diag.c
 echo '#include "diag.h"' >> diag.c
 echo 'static struct _diag_entry_st diag_table[] = {' >> diag.c
 
-truncate -s0 diag.txt.tmp
-for i in `cat diag.txt | sort -u `
+:>diag.txt.tmp
+while read i
 do
     if grep -q $i *.[ch]
     then
