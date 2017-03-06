@@ -11,9 +11,9 @@
 #include "diag.h"
 
 static struct option longopts[] = {
-    {"file", 1, NULL, 'f'},
-    {"help", 0, NULL, 'h'},
-    {"dryrun", 0, NULL, 'n'},
+    {"file", required_argument, NULL, 'f'},
+    {"help", no_argument, NULL, 'h'},
+    {"dryrun", optional_argument, NULL, 'n'},
     {NULL, 0, NULL, 0},
 };
 
@@ -23,7 +23,9 @@ usage(char *progname)
     printf("Usage: %s [OPTIONS]\n"
         "\n"
         "Options:\n"
-        "  -h, --help        print help message and exit\n"
+        "  -f PATH, --file=PATH     File to use.\n"
+        "  -n, --dryrun[=ARG]       Dry run.\n"
+        "  -h, --help               Print help message and exit.\n"
         "\n",
         basename(progname));
 }
