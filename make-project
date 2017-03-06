@@ -377,8 +377,8 @@ testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 nodist_gendata_SOURCES = diag.c
 gendata_SOURCES = gendata.c
 gendata_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-#gendata_LDFLAGS = -L\$(libdir) -lmrkcommon ${_gendata_LDFLAGS}
-gendata_LDFLAGS = ${_gendata_LDFLAGS}
+gendata_LDFLAGS = -L\$(libdir) -lmrkcommon ${_gendata_LDFLAGS}
+#gendata_LDFLAGS = ${_gendata_LDFLAGS}
 
 diag.c diag.h: \$(diags) gen-diag
 	\$(AM_V_GEN) cat \$(diags) | sort -u | ./gen-diag $symbol_pname
