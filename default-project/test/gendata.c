@@ -1,14 +1,26 @@
 #include <assert.h>
+#include <err.h>
+#include <getopt.h>
+#include <libgen.h>
+#include <signal.h>
 #include <stdio.h>
 #include <string.h>
-#include <libgen.h>
-#include <getopt.h>
-#include <err.h>
+
+#ifdef HAVE_MALLOC_H
+#   include <malloc.h>
+#endif
 
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/util.h>
 
 #include "diag.h"
+
+#ifndef NDEBUG
+const char *_malloc_options = "AJ";
+#endif
+
+#define FOO_OPT_DEFAULT_CONFIG_FILE "/usr/local/etc/foo.conf"
+static char *configfile = NULL;
 
 static struct option longopts[] = {
     {"file", required_argument, NULL, 'f'},
@@ -16,6 +28,7 @@ static struct option longopts[] = {
     {"dryrun", optional_argument, NULL, 'n'},
     {NULL, 0, NULL, 0},
 };
+
 
 static void
 usage(char *progname)
@@ -30,10 +43,61 @@ usage(char *progname)
         basename(progname));
 }
 
+
+#ifndef SIGINFO
+UNUSED
+#endif
+static void
+myinfo(UNUSED int sig)
+{
+    //mrkthr_dump_all_ctxes();
+}
+
+
+static void
+myterm(UNUSED int sig)
+{
+    //qwe_shutdown(0);
+}
+
+
 int
 main(UNUSED int argc, char **argv)
 {
     char ch;
+
+#ifdef HAVE_MALLOC_H
+#   ifndef NDEBUG
+    /*
+     * malloc options
+     */
+    if (mallopt(M_CHECK_ACTION, 1) != 1) {
+        FAIL("mallopt");
+    }
+    if (mallopt(M_PERTURB, 0x5a) != 1) {
+        FAIL("mallopt");
+    }
+#   endif
+#endif
+
+    /*
+     * install signal handlers
+     */
+    if (signal(SIGINT, myterm) == SIG_ERR) {
+        return 1;
+    }
+    if (signal(SIGTERM, myterm) == SIG_ERR) {
+        return 1;
+    }
+    if (signal(SIGPIPE, SIG_IGN) == SIG_ERR) {
+        return 1;
+    }
+#ifdef SIGINFO
+    if (signal(SIGINFO, myinfo) == SIG_ERR) {
+        return 1;
+    }
+#endif
+
 
     while ((ch = getopt_long(argc, argv, "f:hn", longopts, NULL)) != -1) {
         switch (ch) {
@@ -73,5 +137,9 @@ main(UNUSED int argc, char **argv)
     argc -= optind;
     argv += optind;
 
+    if (configfile != NULL) {
+        free(configfile);
+        configfile = NULL;
+    }
     return 0;
 }
