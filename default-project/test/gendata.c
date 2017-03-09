@@ -23,8 +23,11 @@ const char *_malloc_options = "AJ";
 static char *configfile = NULL;
 
 static struct option longopts[] = {
+#define GENDATA_OPT_FILE 0
     {"file", required_argument, NULL, 'f'},
+#define GENDATA_OPT_HELP 1
     {"help", no_argument, NULL, 'h'},
+#define GENDATA_OPT_DRYRUN 2
     {"dryrun", optional_argument, NULL, 'n'},
     {NULL, 0, NULL, 0},
 };
