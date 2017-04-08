@@ -319,7 +319,7 @@ diags = diag.txt
 if DEBUG
 DEBUG_FLAGS = -g -O0 @CC_DEBUG@
 else
-DEBUG_FLAGS = -DNDEBUG -O3
+DEBUG_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
 endif
 
 ${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
@@ -365,7 +365,7 @@ diags = diag.txt
 if DEBUG
 DEBUG_FLAGS = -g -O0 @CC_DEBUG@
 else
-DEBUG_FLAGS = -DNDEBUG -O3
+DEBUG_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
 endif
 
 nodist_testfoo_SOURCES = diag.c
