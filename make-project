@@ -239,6 +239,15 @@ case "\$target_os" in
     ;;
 esac
 
+case "\$target_os" in
+    *darwin*)
+        AC_SUBST(_XOPEN_SOURCE_MACRO, ['-D_XOPEN_SOURCE'])
+    ;;
+    *)
+        AC_SUBST(_XOPEN_SOURCE_MACRO)
+    ;;
+esac
+
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_LANG(C)
@@ -322,7 +331,7 @@ else
 DEBUG_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
 endif
 
-${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 
 ${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
 #${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
@@ -370,13 +379,13 @@ endif
 
 nodist_testfoo_SOURCES = diag.c
 testfoo_SOURCES = testfoo.c
-testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 #testfoo_LDFLAGS = -L\$(libdir) -lmrkcommon ${_TESTFOO_LDFLAGS}
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
 nodist_gendata_SOURCES = diag.c
 gendata_SOURCES = gendata.c
-gendata_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+gendata_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 gendata_LDFLAGS = -L\$(libdir) -lmrkcommon ${_gendata_LDFLAGS}
 #gendata_LDFLAGS = ${_gendata_LDFLAGS}
 
