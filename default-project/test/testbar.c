@@ -9,40 +9,45 @@ const char *_malloc_options = "AJ";
 
 
 static int
-gsetup(UNUSED void **state)
+gsetup(void **state)
 {
-    TRACE();
+    (void)state;
+    print_message("%s\n", __func__);
     return 0;
 }
 
 
 static int
-gteardown(UNUSED void **state)
+gteardown(void **state)
 {
-    TRACE();
+    (void)state;
+    print_message("%s\n", __func__);
     return 0;
 }
 
 
 static int
-test1_setup(UNUSED void **state)
+test1_setup(void **state)
 {
-    TRACE();
+    (void)state;
+    print_message("%s\n", __func__);
     return 0;
 }
 
 
 static void
-test1(UNUSED void **state)
+test1(void **state)
 {
-    TRACE();
+    (void)state;
+    print_message("%s\n", __func__);
 }
 
 
 static int
-test1_teardown(UNUSED void **state)
+test1_teardown(void **state)
 {
-    TRACE();
+    (void)state;
+    print_message("%s\n", __func__);
     return 0;
 }
 
