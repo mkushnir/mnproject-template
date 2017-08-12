@@ -163,7 +163,8 @@ CFLAGS+= -Wall -Wextra -Werror  -g
 CFLAGS+= -shared
 .endif
 
-SRCS=	diag.c $_MNAME
+SRCS=	$_MNAME diag.c
+diags=	diag.txt
 
 SUBDIR=test
 
@@ -173,8 +174,8 @@ CXX=clang++
 CPP=clang-cpp
 .endif
 
-diag.c diag.h: diag.txt gen-diag
-	sh ./gen-diag
+diag.c diag.h: \${diags}
+	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
 
 .include <bsd.$_BSD.mk>
 
@@ -323,7 +324,7 @@ cat <<EOD >$pname/src/Makefile.am
 #   - noinst_HEADERS
 
 BUILT_SOURCES = diag.c diag.h
-EXTRA_DIST = \$(diags) gen-diag
+EXTRA_DIST = \$(diags)
 CLEANFILES = \$(BUILT_SOURCES) *.core core
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
@@ -345,13 +346,13 @@ endif
 
 ${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 
-${canonical_pname}_LDFLAGS = ${_VERSIONINFO}
+${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmndiag
 #${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmrkcommon
 #${canonical_pname}_LDFLAGS = -all-static
 #${canonical_pname}_LDFLAGS = -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
 
-diag.c diag.h: \$(diags) gen-diag
-	\$(AM_V_GEN) cat \$(diags) | sort -u | ./gen-diag $symbol_pname
+diag.c diag.h: \$(diags)
+	\$(AM_V_GEN) cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
 
 run: all
 	for i in \$(bin_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -380,12 +381,12 @@ if CMOCKA
 noinst_PROGRAMS += testbar
 endif
 
-BUILT_SOURCES = diag.c diag.h gen-diag
-EXTRA_DIST = \$(diags) gen-diag runscripts
+BUILT_SOURCES = diag.c diag.h
+EXTRA_DIST = \$(diags) runscripts
 
 ${_TEST_LIB_HEADERS}
 
-diags = diag.txt
+diags = diag.txt ../src/diag.txt
 
 if DEBUG
 DEBUG_FLAGS = -g -O0 @CC_DEBUG@
@@ -396,24 +397,24 @@ endif
 nodist_testfoo_SOURCES = diag.c
 testfoo_SOURCES = testfoo.c
 testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-#testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS} -L\$(libdir) -lmrkcommon
+#testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag
 testfoo_LDFLAGS = ${_TESTFOO_LDFLAGS}
 
 if CMOCKA
 testbar_SOURCES = testbar.c
 testbar_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-#testbar_LDFLAGS = ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lcmocka
+#testbar_LDFLAGS = ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag -lcmocka
 testbar_LDFLAGS = ${_TESTBAR_LDFLAGS} -lcmocka
 endif
 
 nodist_gendata_SOURCES = diag.c
 gendata_SOURCES = gendata.c
 gendata_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-gendata_LDFLAGS = ${_gendata_LDFLAGS} -L\$(libdir) -lmrkcommon
+gendata_LDFLAGS = ${_gendata_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag
 #gendata_LDFLAGS = ${_gendata_LDFLAGS}
 
-diag.c diag.h: \$(diags) gen-diag
-	\$(AM_V_GEN) cat \$(diags) | sort -u | ./gen-diag $symbol_pname ../src
+diag.c diag.h: \$(diags)
+	\$(AM_V_GEN) cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c ../src/*.[ch] *.[ch]
 
 testfoo-run: testfoo
 	@if test -x $>; \\
