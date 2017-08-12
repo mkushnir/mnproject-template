@@ -362,7 +362,8 @@ testrun:
 EOD
 
 cat <<EOD >$pname/test/Makefile.am
-CLEANFILES = *.core core
+BUILT_SOURCES = diag.c diag.h
+CLEANFILES = \$(BUILT_SOURCES) *.core core
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
 
@@ -381,7 +382,6 @@ if CMOCKA
 noinst_PROGRAMS += testbar
 endif
 
-BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = \$(diags) runscripts
 
 ${_TEST_LIB_HEADERS}
