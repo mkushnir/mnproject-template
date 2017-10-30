@@ -175,7 +175,7 @@ CPP=clang-cpp
 .endif
 
 diag.c diag.h: \${diags}
-	#cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
+#	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
 	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H diag.h -C diag.c *.[ch]
 
 .include <bsd.$_BSD.mk>
@@ -352,7 +352,7 @@ ${canonical_pname}_LDFLAGS = ${_VERSIONINFO} -L\$(libdir) -lmndiag
 #${canonical_pname}_LDFLAGS = -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
 
 diag.c diag.h: \$(diags)
-	#\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
+#	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
 	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H diag.h -C diag.c *.[ch]
 
 run: all
