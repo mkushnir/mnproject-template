@@ -1,7 +1,22 @@
 #!/bin/sh
 
+pythonbin="`which python 2>/dev/null`"
+if test -z "$pythonbin"
+then
+    pythonbin="`which python2 2>/dev/null`"
+fi
+if test -z "$pythonbin"
+then
+    pythonbin="`which python2.7 2>/dev/null`"
+fi
+if test -z "$pythonbin"
+then
+    echo "Python binary was not found. Exiting ..."
+    exit 1
+fi
+
 align() {
-    python -c "import time; ts=time.time();tts=$1-(ts%$1);print 'Sleeping for %s seconds...'%tts;time.sleep(tts);print time.time()"
+    "$pythonbin" -c "import time; ts=time.time();tts=$1-(ts%$1);print 'Sleeping for %s seconds...'%tts;time.sleep(tts);print time.time()"
 }
 
 out() {
