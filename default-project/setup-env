@@ -24,12 +24,26 @@ then
     autoreconf --force
     ./configure --prefix=$HOME --enable-debug
 
+elif test "$1" = "dev-static"
+then
+    export LDFLAGS="-L$HOME/lib -L/usr/local/lib"
+    export CFLAGS="-I$HOME/include -I/usr/local/include"
+    autoreconf --force
+    ./configure --prefix=$HOME --enable-debug --enable-allstatic
+
 elif test "$1" = "dev-ndebug"
 then
     export LDFLAGS="-L$HOME/lib -L/usr/local/lib"
     export CFLAGS="-I$HOME/include -I/usr/local/include"
     autoreconf --force
     ./configure --prefix=$HOME
+
+elif test "$1" = "dev-ndebug-static"
+then
+    export LDFLAGS="-L$HOME/lib -L/usr/local/lib"
+    export CFLAGS="-I$HOME/include -I/usr/local/include"
+    autoreconf --force
+    ./configure --prefix=$HOME --enable-allstatic
 
 elif test "$1" = "dist"
 then
