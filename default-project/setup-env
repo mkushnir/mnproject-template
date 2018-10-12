@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# On Linux: apt-get install autotools-dev autoconf libtool
+# On Linux:
+#   apt-get install autotools-dev autoconf libtool
+#   yum group install "Development Tools"
 #
 if test "$1" = "init"
 then
