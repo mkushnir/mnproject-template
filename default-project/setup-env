@@ -10,6 +10,7 @@
 #
 #   yum install epel-release
 #   yum group install "Development Tools"
+#   yum install openssl-devel zlib-devel libev-devel
 #
 if test "$1" = "init"
 then
