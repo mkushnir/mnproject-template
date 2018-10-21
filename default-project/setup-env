@@ -1,7 +1,14 @@
 #!/bin/sh
 
+# On FreeBSD:
+#   pkg install autotools
+#
 # On Linux:
+#   apt-get update
 #   apt-get install autotools-dev autoconf libtool
+#   or apt-get install build-essential
+#
+#   yum install epel-release
 #   yum group install "Development Tools"
 #
 if test "$1" = "init"
