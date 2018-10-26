@@ -23,6 +23,8 @@ configure
 configure.scan
 depcomp
 diag.[ch]
+*-diag.[ch]
+diag.txt.tmp
 install-sh
 libtool
 ltmain.sh
