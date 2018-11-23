@@ -214,23 +214,32 @@ then
             exit 1
         fi
     fi
+    AC_SUBST(CC_DEBUG, ['-ftrapv'])
 else
     if which clang >/dev/null
     then
         CC="clang -Qunused-arguments -fcolor-diagnostics"
         CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
         CPP="clang-cpp"
-        #clang_version=\`clang --version | grep version | awk '{print \$4;}'\`
-        #clang_version_mjr=\`echo \$clang_version | awk -F. '{print \$1;}'\`
-        #clang_version_mnr=\`echo \$clang_version | awk -F. '{print \$2;}'\`
+        clang_version=\`clang --version | grep version | awk '{print \$4;}'\`
+        clang_version_mjr=\`echo \$clang_version | awk -F. '{print \$1;}'\`
+        clang_version_mnr=\`echo \$clang_version | awk -F. '{print \$2;}'\`
+        if test "\$clang_version_mjr" = "3" -a "\$clang_version_mnr" -lt 3
+        then
+            AC_SUBST(CC_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
+        else
+            # we assume all others are 3.3+
+            AC_SUBST(CC_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -fno-sanitize=alignment'])
+        fi
+        AC_SUBST(CC_LTO, ['-flto'])
+        AC_SUBST(LD_LTO, ['-Wl,--lto-O3'])
     else
         CC="cc"
         CXX="c++"
         CPP="cpp"
+        AC_SUBST(CC_DEBUG, ['-ftrapv'])
     fi
 fi
-
-AC_SUBST(CC_DEBUG, ['-ftrapv'])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -294,7 +303,17 @@ AC_ARG_ENABLE(allstatic,
                AC_MSG_NOTICE([Will build statically])
               ],
               [AM_CONDITIONAL([ALLSTATIC], [test "\$enable_allstatic" = "yes"])
-               AC_MSG_NOTICE([Will not build statically ])
+               AC_MSG_NOTICE([Will not build statically])
+              ])
+
+AC_ARG_ENABLE(lto,
+              AC_HELP_STRING([--enable-lto],
+                             [Enable all static build (default=no)]),
+              [AM_CONDITIONAL([LTO], [enable_lto=yes])
+               AC_MSG_NOTICE([Will enable LTO])
+              ],
+              [AM_CONDITIONAL([LTO], [test "\$enable_lto" = "yes"])
+               AC_MSG_NOTICE([Will not enable LTO])
               ])
 
 AC_ARG_WITH(cmocka,
@@ -350,9 +369,16 @@ nodist_${canonical_pname}_SOURCES = diag.c
 noinst_HEADERS = ${pname}-diag.h
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 @CC_DEBUG@
+DEBUG_CC_FLAGS = -g -O0 @CC_DEBUG@
+DEBUG_LD_FLAGS =
 else
-DEBUG_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
+if LTO
+DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer @CC_LTO@
+DEBUG_LD_FLAGS = @LD_LTO@
+else
+DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
+DEBUG_LD_FLAGS =
+endif
 endif
 
 if ALLSTATIC
@@ -361,12 +387,12 @@ else
 ${canonical_pname}_LDFLAGS =
 endif
 
-${canonical_pname}_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+${canonical_pname}_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 
-${canonical_pname}_LDFLAGS += ${_VERSIONINFO} -L\$(libdir) -lmndiag
-#${canonical_pname}_LDFLAGS += ${_VERSIONINFO} -L\$(libdir) -lmrkcommon -lmndiag
-#${canonical_pname}_LDFLAGS += -all-static
-#${canonical_pname}_LDFLAGS += -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
+${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_VERSIONINFO} -L\$(libdir) -lmndiag
+#${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_VERSIONINFO} -L\$(libdir) -lmrkcommon -lmndiag
+#${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static
+#${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
 
 diag.c ${pname}-diag.h: \$(diags)
 #	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H ${pname}-diag.h -C diag.c *.[ch]
@@ -407,9 +433,16 @@ ${_TEST_LIB_HEADERS}
 diags = diag.txt ../src/diag.txt
 
 if DEBUG
-DEBUG_FLAGS = -g -O0 @CC_DEBUG@
+DEBUG_CC_FLAGS = -g -O0 @CC_DEBUG@
+DEBUG_LD_FLAGS =
 else
-DEBUG_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
+if LTO
+DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer @CC_LTO@
+DEBUG_LD_FLAGS = @LD_LTO@
+else
+DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
+DEBUG_LD_FLAGS =
+endif
 endif
 
 if ALLSTATIC
@@ -424,22 +457,25 @@ endif
 
 nodist_testfoo_SOURCES = diag.c
 testfoo_SOURCES = testfoo.c
-testfoo_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-#testfoo_LDFLAGS += ${_TESTFOO_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag
-testfoo_LDFLAGS += ${_TESTFOO_LDFLAGS} -lmndiag
+if LTO
+testfoo_SOURCES += ../src/${pname}.c
+endif
+testfoo_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+#testfoo_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTFOO_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag
+testfoo_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTFOO_LDFLAGS} -lmndiag
 
 if CMOCKA
 testbar_SOURCES = testbar.c
-testbar_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-#testbar_LDFLAGS += ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag -lcmocka
-testbar_LDFLAGS += ${_TESTBAR_LDFLAGS} -lcmocka -lmndiag
+testbar_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+#testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag -lcmocka
+testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS} -lcmocka -lmndiag
 endif
 
 nodist_gendata_SOURCES = diag.c
 gendata_SOURCES = gendata.c
-gendata_CFLAGS = \$(DEBUG_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-gendata_LDFLAGS += ${_gendata_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag
-#gendata_LDFLAGS += ${_gendata_LDFLAGS}
+gendata_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+gendata_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_gendata_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag
+#gendata_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_gendata_LDFLAGS}
 
 diag.c ${pname}-diag.h: \$(diags)
 #	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H ${pname}-diag.h -C diag.c ../src/*.[ch] *.[ch]

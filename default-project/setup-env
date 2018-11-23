@@ -12,6 +12,31 @@
 #   yum group install "Development Tools"
 #   yum install openssl-devel zlib-devel libev-devel
 #
+# Git setup:
+#   git init
+#   git add \
+#     .gitignore \
+#     AUTHORS \
+#     COPYING \
+#     ChangeLog \
+#     Makefile.am \
+#     NEWS \
+#     README \
+#     configure.ac \
+#     man/Makefile.am \
+#     setup-env \
+#     src/${pname}.c \
+#     src/${pname}.h \
+#     src/${pname}_private.h \
+#     src/Makefile.am \
+#     src/diag.txt \
+#     test/Makefile.am \
+#     test/diag.txt \
+#     test/gendata.c \
+#     test/runscripts \
+#     test/testbar.c \
+#     test/testfoo.c \
+#     test/unittest.h
 if test "$1" = "init"
 then
     export LDFLAGS="-L$HOME/lib -L/usr/local/lib"
@@ -53,7 +78,7 @@ then
     export LDFLAGS="-L$HOME/lib -L/usr/local/lib"
     export CFLAGS="-I$HOME/include -I/usr/local/include"
     autoreconf --force
-    ./configure --prefix=$HOME --enable-allstatic
+    ./configure --prefix=$HOME --enable-allstatic --enable-lto
 
 elif test "$1" = "dist"
 then
