@@ -1,0 +1,29 @@
+#!/bin/sh
+
+if ! test -d "$1"
+then
+    echo "$1" is not directory
+    exit 1
+fi
+
+if ! test -e "$1/Makefile.am"
+then
+    echo "No such file: $1/Makefile.am"
+    exit 1
+fi
+
+if ! test -e "$1/Makefile"
+then
+    echo "No such file: $1/Makefile"
+    exit 1
+fi
+
+vars="`grep -E -o '^[a-zA-Z0-9_]+_SOURCES' $1/Makefile.am`"
+
+if test -n "$vars"
+then
+    for var in `echo $vars`
+    do
+        make -f $1/Makefile -V $var
+    done
+fi

@@ -195,71 +195,68 @@ EOD
 
 cat <<EOD >$pname/configure.ac
 AC_INIT($pname, 0.1, markiyan.kushnir@gmail.com, $pname, https://github.com/mkushnir)
-if test -n "\$USE_GCC"
-then
+
+AS_IF([test -n "\$USE_GCC"],
+[
     probe="gcc\${USE_GCC}"
-    if which \$probe >/dev/null
-    then
+    AS_IF([which \$probe >/dev/null],
+    [
         CC="gcc\${USE_GCC}"
         CXX="c++\${USE_GCC}"
         CPP="cpp"
-    else
-        if which gcc >/dev/null
-        then
+    ],
+    [
+        AS_IF([which gcc >/dev/null],
+        [
             CC="gcc"
             CXX="g++"
             CPP="cpp"
-        else
+        ],
+        [
             echo "Cannot find gcc"
             exit 1
-        fi
-    fi
+        ])
+    ])
     AC_SUBST(CC_DEBUG, ['-ftrapv'])
-else
-    if which clang >/dev/null
-    then
+],
+[
+    AS_IF([which clang >/dev/null],
+    [
         CC="clang -Qunused-arguments -fcolor-diagnostics"
         CXX="clang++ -Qunused-arguments -fcolor-diagnostics"
         CPP="clang-cpp"
         clang_version=\`clang --version | grep version | awk '{print \$4;}'\`
         clang_version_mjr=\`echo \$clang_version | awk -F. '{print \$1;}'\`
         clang_version_mnr=\`echo \$clang_version | awk -F. '{print \$2;}'\`
-        if test "\$clang_version_mjr" = "3" -a "\$clang_version_mnr" -lt 3
-        then
-            AC_SUBST(CC_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])
-        else
-            # we assume all others are 3.3+
-            AC_SUBST(CC_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -fno-sanitize=alignment'])
-        fi
+        AS_IF([test "\$clang_version_mjr" = "3" -a "\$clang_version_mnr" -lt 3],
+            [AC_SUBST(CC_DEBUG, ['-ftrapv -fcatch-undefined-behavior'])],
+            [AC_SUBST(CC_DEBUG, ['-fsanitize=undefined-trap -fsanitize-undefined-trap-on-error -fno-sanitize=alignment'])])
         AC_SUBST(CC_LTO, ['-flto'])
         AC_SUBST(LD_LTO, ['-Wl,--lto-O3'])
-    else
+    ],
+    [
         CC="cc"
         CXX="c++"
         CPP="cpp"
         AC_SUBST(CC_DEBUG, ['-ftrapv'])
-    fi
-fi
+    ])
+])
+
+
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-case "\$target_os" in
-    *linux*)
-        AC_SUBST(_GNU_SOURCE_MACRO, ['-D_GNU_SOURCE'])
-    ;;
-    *)
-        AC_SUBST(_GNU_SOURCE_MACRO)
-    ;;
-esac
 
-case "\$target_os" in
-    *darwin*)
-        AC_SUBST(_XOPEN_SOURCE_MACRO, ['-D_XOPEN_SOURCE'])
-    ;;
-    *)
-        AC_SUBST(_XOPEN_SOURCE_MACRO)
-    ;;
-esac
+
+AS_CASE(["\$target_os"],
+    [*linux*], [AC_SUBST(_GNU_SOURCE_MACRO, ['-D_GNU_SOURCE'])],
+    [AC_SUBST(_GNU_SOURCE_MACRO)]
+)
+
+AS_CASE(["\$target_os"],
+    [*darwin*], [AC_SUBST(_XOPEN_SOURCE_MACRO, ['-D_XOPEN_SOURCE'])],
+    [AC_SUBST(_XOPEN_SOURCE_MACRO)]
+)
 
 AC_CONFIG_MACRO_DIR([m4])
 
