@@ -1,29 +1,75 @@
 #!/bin/sh
 
-if ! test -d "$1"
-then
-    echo "$1" is not directory
-    exit 1
-fi
 
-if ! test -e "$1/Makefile.am"
-then
-    echo "No such file: $1/Makefile.am"
-    exit 1
-fi
+_find_sources() {
+    local vars var
 
-if ! test -e "$1/Makefile"
-then
-    echo "No such file: $1/Makefile"
-    exit 1
-fi
+    vars="`grep -E -o '^[a-zA-Z0-9_]+_SOURCES' $1/Makefile.am || true`"
 
-vars="`grep -E -o '^[a-zA-Z0-9_]+_SOURCES' $1/Makefile.am`"
+    if test -n "$vars"
+    then
+        for var in `echo $vars`
+        do
+            ${_MAKE_V} $var -f $1/Makefile || true
+        done
+    fi
+}
 
-if test -n "$vars"
-then
-    for var in `echo $vars`
+
+_find_all_sources() {
+    local i sources
+    for i in $@
     do
-        make -f $1/Makefile -V $var
+        if ! test -d "$i"
+        then
+            echo "$i" is not a directory >&2
+            exit 1
+        fi
+
+        if ! test -e "$i/Makefile.am"
+        then
+            echo "No such file: $i/Makefile.am" >&2
+            exit 1
+        fi
+
+        if ! test -e "$i/Makefile"
+        then
+            echo "No such file: $i/Makefile" >&2
+            exit 1
+        fi
+
+        sources="`_find_sources $i`"
+        if test -n "$sources"
+        then
+            echo $sources | xargs -n1 -I% echo $i/%
+        fi
     done
+}
+
+
+_gmake_v() {
+    local _v
+    _v=$1
+    shift
+    eval gmake --eval "'_mn_qwe: ; @echo \$(${_v})'" $@
+}
+
+
+#
+# main
+#
+: ${MAKE:=make}
+if test "$MAKE" = gmake
+then
+    _MAKE_V=_gmake_v
+else
+    _MAKE_V="$MAKE -V"
 fi
+export _MAKE_V
+
+# All or nothing: set -e ... set +e
+set -e
+all_sources="`_find_all_sources $@`"
+set +e
+all_sources="`echo $all_sources | xargs -n1 -I% echo % | sort -u`"
+echo $all_sources
