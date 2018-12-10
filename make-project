@@ -15,6 +15,7 @@ _SHLIB=
 _VERSIONINFO="-version-info 0:0:0"
 force=0
 noinit=0
+subdirs=third-party/asd
 
 args=`getopt fhnt:v: $*`
 if test $? -ne 0
@@ -262,6 +263,8 @@ AS_CASE(["\$target_os"],
 
 AC_CONFIG_MACRO_DIR([m4])
 
+AC_CONFIG_SUBDIRS([$subdirs])
+
 AC_LANG(C)
 
 AC_PROG_CC
@@ -327,7 +330,10 @@ AC_OUTPUT
 EOD
 
 cat <<EOD >$pname/Makefile.am
-SUBDIRS = src man test
+SUBDIRS = $subdirs
+SUBDIRS += src man test
+DIST_SUBDIRS = $subdirs
+DIST_SUBDIRS += src man test
 #CLEANFILES = *.in *.m4 *.log *.scan configure
 ACLOCAL_AMFLAGS = '-Im4'
 AM_MAKEFLAGS = -s
