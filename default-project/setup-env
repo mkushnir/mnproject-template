@@ -71,8 +71,16 @@ do_dev_ndebug_static() {
 }
 
 
-#dirs="third-party/mndiag third-party/mrkcommon third-party/mrkl4c ."
+# This is a sample third party project.
+#
+# While it makes no harm you can safely remove it.
+#
+# And you can add any projects that can be integrated using GNU autotools.
+# In order to do that, you have to keep in sync AC_CONFIG_SUBDIRS() macro
+# in this project's configure.ac as well as SUBDIRS and DIST_SUBDIRS in
+# this project's top level Makefile.am
 dirs="third-party/asd ."
+#dirs="third-party/mndiag third-party/mrkcommon third-party/mrkl4c ."
 R=`pwd -P`
 
 LDFLAGS=
