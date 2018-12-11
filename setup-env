@@ -2,16 +2,16 @@
 
 if test "$1" = "init"
 then
-    ;
+    true
 elif test "$1" = "dev"
 then
-    ;
+    true
 elif test "$1" = "dev-ndebug"
 then
-    ;
+    true
 elif test "$1" = "dist"
 then
-    ;
+    true
 else
     echo "`basename $0` {init|dev|dist|dev-ndebug}"
 fi
