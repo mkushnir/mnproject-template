@@ -79,30 +79,26 @@ do_dev_ndebug_static() {
 # In order to do that, you have to keep in sync AC_CONFIG_SUBDIRS() macro
 # in this project's configure.ac as well as SUBDIRS and DIST_SUBDIRS in
 # this project's top level Makefile.am
-dirs="third-party/asd ."
+dirs=.
+_dirs="third-party/asd $dirs"
 #dirs="third-party/mndiag third-party/mrkcommon third-party/mrkl4c ."
 R=`pwd -P`
 
 LDFLAGS=
-for i in $dirs
+CFLAGS=
+for i in $_dirs
 do
     LDFLAGS="$LDFLAGS -L${R}/$i/src/.libs"
-done
-LDFLAGS="$LDFLAGS -L$HOME/lib -L/usr/local/lib"
-export LDFLAGS
-
-CFLAGS=
-for i in $dirs
-do
     CFLAGS="$CFLAGS -I${R}/$i/src"
 done
+LDFLAGS="$LDFLAGS -L$HOME/lib -L/usr/local/lib"
 CFLAGS="$CFLAGS -I$HOME/include -I/usr/local/include"
+export LDFLAGS
 export CFLAGS
 
-dirs=.
 if test "$1" = "init"
 then
-    for i in $dirs
+    for i in $_dirs
     do
         ( cd $i && do_init )
     done
