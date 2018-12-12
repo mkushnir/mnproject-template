@@ -93,9 +93,9 @@ then
     _AM_PROG="lib_LTLIBRARIES = lib${pname}.la"
     _LIB_HEADERS="nobase_include_HEADERS = $pname.h"
     _TEST_LIB_HEADERS="#noinst_HEADERS = ../src/$pname.h"
-    _GENDATA_LDFLAGS="-L\$(top_srcdir)/src/.libs -l$pname"
-    _TESTFOO_LDFLAGS="-L\$(top_srcdir)/src/.libs -l$pname"
-    _TESTBAR_LDFLAGS="-L\$(top_srcdir)/src/.libs -l$pname"
+    _GENDATA_LDFLAGS="-L\$(top_srcdir)/src/.libs"
+    _TESTFOO_LDFLAGS="-L\$(top_srcdir)/src/.libs"
+    _TESTBAR_LDFLAGS="-L\$(top_srcdir)/src/.libs"
     _LIBLD=LIBADD
     rm "$pname/src/main.c"
     touch $pname/src/$pname.c $pname/src/$pname.h $pname/src/${pname}_private.h
@@ -197,7 +197,17 @@ testrun:
 EOD
 
 cat <<EOD >$pname/configure.ac
-AC_INIT($pname, 0.1, markiyan.kushnir@gmail.com, $pname, https://github.com/mkushnir)
+AC_PREREQ([2.69])
+AC_INIT([$pname], [0.1], [markiyan.kushnir@gmail.com], [$pname], [https://github.com/mkushnir])
+
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_SRCDIR([config.h.in])
+AC_CONFIG_HEADERS(config.h)
+AC_CONFIG_SUBDIRS([$subdirs])
+echo "lto_sources =" > \${ac_pwd}/lto-sources.mk
+dnl echo "lto_sources += \`\${ac_pwd}/find-sources \${ac_pwd}/third-party/asd/src\`" >> \${ac_pwd}/lto-sources.mk
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
+
 
 AS_IF([test -n "\$USE_GCC"],
 [
@@ -246,10 +256,8 @@ AS_IF([test -n "\$USE_GCC"],
 ])
 
 
-
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
-
 
 AS_CASE(["\$target_os"],
     [*linux*], [AC_SUBST(_GNU_SOURCE_MACRO, ['-D_GNU_SOURCE'])],
@@ -261,27 +269,24 @@ AS_CASE(["\$target_os"],
     [AC_SUBST(_XOPEN_SOURCE_MACRO)]
 )
 
-AC_CONFIG_MACRO_DIR([m4])
 
-AC_CONFIG_SUBDIRS([$subdirs])
-
-AC_LANG(C)
-
-AC_PROG_CC
-AC_PROG_CXX
-AM_PROG_AR
-AC_PROG_RANLIB
-AC_PROG_INSTALL
-
-LT_INIT
 AM_INIT_AUTOMAKE([foreign subdir-objects])
+LT_INIT
 AM_SILENT_RULES([yes])
 
 dnl AM_MAINTAINER_MODE
 
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
 
-AC_CONFIG_HEADERS(config.h)
+AC_LANG(C)
+
+AC_PROG_CXX
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CPP
+AC_PROG_INSTALL
+AC_PROG_LN_S
+AC_PROG_MAKE_SET
+AC_PROG_RANLIB
 
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
@@ -289,6 +294,7 @@ AC_FUNC_REALLOC
 AC_CHECK_FUNCS([srandomdev])
 AC_CHECK_HEADERS([malloc.h])
 AC_CHECK_HEADER_STDBOOL
+
 
 AC_PRESERVE_HELP_ORDER
 
@@ -443,6 +449,7 @@ DEBUG_CC_FLAGS = -DNDEBUG -O3 -fomit-frame-pointer
 if LTO
 DEBUG_CC_FLAGS += @CC_LTO@
 DEBUG_LD_FLAGS += @LD_LTO@
+#include \$(top_srcdir)/lto-sources.mk
 endif
 endif
 
@@ -457,29 +464,26 @@ gendata_LDFLAGS =
 endif
 
 nodist_testfoo_SOURCES = diag.c
-testfoo_SOURCES = testfoo.c
-if LTO
-testfoo_SOURCES += ../src/${pname}.c
-endif
+testfoo_SOURCES = \$(lto_sources) testfoo.c
 testfoo_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 testfoo_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTFOO_LDFLAGS}
-testfoo_LDADD = -lmndiag
+testfoo_LDADD = -l${pname} -lmndiag
 #testfoo_LDADD += -lmrkcommon
 
 if CMOCKA
-testbar_SOURCES = testbar.c
+testbar_SOURCES = \$(lto_sources) testbar.c
 testbar_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 #testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag -lcmocka
 testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS}
-testbar_LDADD = -lmndiag -lcmocka
+testbar_LDADD = -l${pname} -lmndiag -lcmocka
 #testbar_LDADD += -lmrkcommon
 endif
 
 nodist_gendata_SOURCES = diag.c
-gendata_SOURCES = gendata.c
+gendata_SOURCES = \$(lto_sources) gendata.c
 gendata_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 gendata_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_GENDATA_LDFLAGS} -L\$(libdir)
-gendata_LDADD = -lmrkcommon -lmndiag
+gendata_LDADD = -l${pname} -lmrkcommon -lmndiag
 
 diag.c ${pname}-diag.h: \$(diags)
 #	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H ${pname}-diag.h -C diag.c ../src/*.[ch] *.[ch]

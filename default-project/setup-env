@@ -99,6 +99,7 @@ done
 CFLAGS="$CFLAGS -I$HOME/include -I/usr/local/include"
 export CFLAGS
 
+dirs=.
 if test "$1" = "init"
 then
     for i in $dirs
