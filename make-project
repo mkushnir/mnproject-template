@@ -12,7 +12,7 @@ _GRP=BINGRP
 _MNAME='foo.c main.c'
 _BSD=prog
 _SHLIB=
-_VERSIONINFO="-version-info 0:0:0"
+_VERSIONINFO="0:0:0"
 force=0
 noinit=0
 subdirs=third-party/asd
@@ -46,7 +46,7 @@ do
         ;;
     -v)
         shift
-        _VERSIONINFO="-version-info $1"
+        _VERSIONINFO="$1"
         shift
         ;;
     --)
@@ -80,6 +80,7 @@ fi
 
 #cp -R default-project "$pname";
 symbol_pname=`echo $pname | sed -e 's/[^a-zA-Z0-9_]/_/g'`
+symbol_pname_upper=`echo $symbol_pname | sed 'y/abcdefghijklnmopqrstuvwxyz/ABCDEFGHIJKLNMOPQRSTUVWXYZ/'`
 
 if test "$type" = "lib"
 then
@@ -159,7 +160,7 @@ LIBOBJC=/usr/lib/libobjc.a
 LIBC=/usr/lib/libc.a
 
 NO_MAN=
-CSTD=c99
+CSTD=c11
 CFLAGS+= -Wall -Wextra -Werror  -g
 
 .ifdef SHARED
@@ -200,7 +201,10 @@ cat <<EOD >$pname/configure.ac
 AC_PREREQ([2.69])
 AC_INIT([$pname], [0.1], [markiyan.kushnir@gmail.com], [$pname], [https://github.com/mkushnir])
 
+AC_SUBST([LIB${symbol_pname_upper}_ABI_VERSION], [${_VERSIONINFO}])
+
 AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_AUX_DIR([.ac-aux])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS(config.h)
 AC_CONFIG_SUBDIRS([$subdirs])
@@ -286,7 +290,6 @@ AC_PROG_CPP
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
-AC_PROG_RANLIB
 
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
@@ -314,7 +317,7 @@ AM_CONDITIONAL([ALLSTATIC], [test "\$enable_allstatic" = "yes"])
 
 AC_ARG_ENABLE(lto,
               AC_HELP_STRING([--enable-lto],
-                             [Enable all static build (default=no)]),
+                             [Enable lto build (default=no)]),
               [AC_MSG_NOTICE([Will enable LTO])],
               [AC_MSG_NOTICE([Will not enable LTO])])
 
@@ -364,7 +367,7 @@ cat <<EOD >$pname/src/Makefile.am
 diags = diag.txt
 BUILT_SOURCES = diag.c ${pname}-diag.h
 EXTRA_DIST = \$(diags)
-CLEANFILES = \$(BUILT_SOURCES) *.core core
+CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
 
@@ -394,9 +397,9 @@ else
 ${canonical_pname}_LDFLAGS =
 endif
 
-${canonical_pname}_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+${canonical_pname}_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 
-${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_VERSIONINFO} -L\$(libdir)
+${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -version-info @LIB${symbol_pname_upper}_ABI_VERSION@ -L\$(libdir)
 ${canonical_pname}_${_LIBLD} = -lmndiag
 #${canonical_pname}_${_LIBLD} += -lmrkcommon
 #${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static
@@ -415,7 +418,7 @@ EOD
 
 cat <<EOD >$pname/test/Makefile.am
 BUILT_SOURCES = diag.c ${pname}-diag.h
-CLEANFILES = \$(BUILT_SOURCES) *.core core
+CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
 
@@ -465,14 +468,14 @@ endif
 
 nodist_testfoo_SOURCES = diag.c
 testfoo_SOURCES = \$(lto_sources) testfoo.c
-testfoo_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+testfoo_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 testfoo_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTFOO_LDFLAGS}
 testfoo_LDADD = -l${pname} -lmndiag
 #testfoo_LDADD += -lmrkcommon
 
 if CMOCKA
 testbar_SOURCES = \$(lto_sources) testbar.c
-testbar_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+testbar_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 #testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag -lcmocka
 testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS}
 testbar_LDADD = -l${pname} -lmndiag -lcmocka
@@ -481,7 +484,7 @@ endif
 
 nodist_gendata_SOURCES = diag.c
 gendata_SOURCES = \$(lto_sources) gendata.c
-gendata_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c99 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+gendata_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 gendata_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_GENDATA_LDFLAGS} -L\$(libdir)
 gendata_LDADD = -l${pname} -lmrkcommon -lmndiag
 

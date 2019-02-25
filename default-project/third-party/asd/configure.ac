@@ -1,6 +1,7 @@
 AC_INIT(asd, 0.1, markiyan.kushnir@gmail.com, asd, https://github.com/mkushnir)
 
 AC_LANG(C)
+AC_CONFIG_AUX_DIR([.ac-aux])
 AC_CONFIG_HEADERS(config.h)
 
 LT_INIT
