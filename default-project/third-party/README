@@ -1,2 +1,6 @@
 This directory is a place for third party projects that can be integrated
 with the GNU autotools.
+
+To add a third-party module, cd to ${topsrcdir}/third-party:
+
+    $(topsrcdir)/third-party % git add URL

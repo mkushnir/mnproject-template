@@ -37,7 +37,14 @@
 #     test/testbar.c \
 #     test/testfoo.c \
 #     test/unittest.h
+
+do_pre() {
+    #git submodule update
+}
+
+
 do_init() {
+    do_pre
     #autoreconf --force --install
     autoreconf --force
     aclocal
@@ -50,22 +57,30 @@ do_init() {
     ./configure --prefix=$HOME --enable-debug
 }
 
+
 do_dev() {
+    do_pre
     autoreconf --force
     ./configure --prefix=$HOME --enable-debug
 }
 
+
 do_dev_static() {
+    do_pre
     autoreconf --force
     ./configure --prefix=$HOME --enable-debug --enable-allstatic
 }
 
+
 do_dev_ndebug() {
+    do_pre
     autoreconf --force
     ./configure --prefix=$HOME
 }
 
+
 do_dev_ndebug_static() {
+    do_pre
     autoreconf --force
     ./configure --prefix=$HOME --enable-allstatic --enable-lto
 }
@@ -135,6 +150,8 @@ elif test "$1" = "dist"
 then
     unset LDFLAGS
     unset CFLAGS
+
+    do_pre
     autoreconf --force
     ./configure
 
