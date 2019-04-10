@@ -38,15 +38,20 @@
 #     test/testfoo.c \
 #     test/unittest.h
 
+
+die() {
+    echo $*
+    exit 1
+}
+
+
 do_pre() {
     #git submodule update
 }
 
 
 do_init() {
-    do_pre
-    #autoreconf --force --install
-    autoreconf --force
+    autoreconf --force || die fix your errors
     aclocal
     autoheader
     autoreconf
@@ -59,29 +64,25 @@ do_init() {
 
 
 do_dev() {
-    do_pre
-    autoreconf --force
+    autoreconf --force || die fix your errors
     ./configure --prefix=$HOME --enable-debug
 }
 
 
 do_dev_static() {
-    do_pre
-    autoreconf --force
+    autoreconf --force || die fix your errors
     ./configure --prefix=$HOME --enable-debug --enable-allstatic
 }
 
 
 do_dev_ndebug() {
-    do_pre
-    autoreconf --force
+    autoreconf --force || die fix your errors
     ./configure --prefix=$HOME
 }
 
 
 do_dev_ndebug_static() {
-    do_pre
-    autoreconf --force
+    autoreconf --force || die fix your errors
     ./configure --prefix=$HOME --enable-allstatic --enable-lto
 }
 
@@ -91,17 +92,20 @@ do_dev_ndebug_static() {
 # While it makes no harm you can safely remove it.
 #
 # And you can add any projects that can be integrated using GNU autotools.
-# In order to do that, you have to keep in sync AC_CONFIG_SUBDIRS() macro
-# in this project's configure.ac as well as SUBDIRS and DIST_SUBDIRS in
-# this project's top level Makefile.am
+#
+# In order to do that, you have to keep in sync:
+#   - AC_CONFIG_SUBDIRS() macro in this project's configure.ac as well as
+#   - SUBDIRS and DIST_SUBDIRS in this project's top level Makefile.am
+
+#tpdirs="third-party/mndiag third-party/mrkcommon third-party/mrkl4c"
+#tpdirs="third-party/asd"
+
 dirs=.
-_dirs="third-party/asd $dirs"
-#dirs="third-party/mndiag third-party/mrkcommon third-party/mrkl4c ."
 R=`pwd -P`
 
 LDFLAGS=
 CFLAGS=
-for i in $_dirs
+for i in $dirs $tpdirs
 do
     LDFLAGS="$LDFLAGS -L${R}/$i/src/.libs"
     CFLAGS="$CFLAGS -I${R}/$i/src"
@@ -113,13 +117,15 @@ export CFLAGS
 
 if test "$1" = "init"
 then
-    for i in $_dirs
+    #git submodule init
+    for i in $tpdirs $dirs
     do
         ( cd $i && do_init )
     done
 
 elif test "$1" = "dev"
 then
+    do_pre
     for i in $dirs
     do
         ( cd $i && do_dev )
@@ -127,6 +133,7 @@ then
 
 elif test "$1" = "dev-static"
 then
+    do_pre
     for i in $dirs
     do
         ( cd $i && do_dev_static )
@@ -134,6 +141,7 @@ then
 
 elif test "$1" = "dev-ndebug"
 then
+    do_pre
     for i in $dirs
     do
         ( cd $i && do_dev_ndebug )
@@ -141,6 +149,7 @@ then
 
 elif test "$1" = "dev-ndebug-static"
 then
+    do_pre
     for i in $dirs
     do
         ( cd $i && do_dev_ndebug_static )
