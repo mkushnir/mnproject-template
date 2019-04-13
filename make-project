@@ -207,7 +207,7 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_AUX_DIR([.ac-aux])
 AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS(config.h)
-AC_CONFIG_SUBDIRS([$subdirs])
+dnl AC_CONFIG_SUBDIRS([$subdirs])
 echo "lto_sources =" > \${ac_pwd}/lto-sources.mk
 dnl echo "lto_sources += \`\${ac_pwd}/find-sources \${ac_pwd}/third-party/asd/src\`" >> \${ac_pwd}/lto-sources.mk
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
@@ -340,9 +340,9 @@ AC_OUTPUT
 EOD
 
 cat <<EOD >$pname/Makefile.am
-SUBDIRS = $subdirs
+#SUBDIRS = $subdirs
 SUBDIRS += src man test
-DIST_SUBDIRS = $subdirs
+#DIST_SUBDIRS = $subdirs
 DIST_SUBDIRS += src man test
 #CLEANFILES = *.in *.m4 *.log *.scan configure
 ACLOCAL_AMFLAGS = '-Im4'
