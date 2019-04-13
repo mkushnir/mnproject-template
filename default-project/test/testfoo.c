@@ -4,7 +4,7 @@
 #include "unittest.h"
 
 #ifndef NDEBUG
-const char *malloc_conf = "abort:true,junk:true";
+const char *malloc_conf = "abort:true,junk:true,xmalloc:true";
 #endif
 
 static void

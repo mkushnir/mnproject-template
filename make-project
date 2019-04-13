@@ -178,9 +178,9 @@ CXX=clang++
 CPP=clang-cpp
 .endif
 
-diag.c ${pname}-diag.h: \${diags}
-#	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H ${pname}-diag.h -C diag.c *.[ch]
-	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H ${pname}-diag.h -C diag.c *.[ch]
+diag.c diag.h: \${diags}
+#	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
+	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H diag.h -C diag.c *.[ch]
 
 .include <bsd.$_BSD.mk>
 
@@ -365,7 +365,7 @@ cat <<EOD >$pname/src/Makefile.am
 #   - noinst_HEADERS
 
 diags = diag.txt
-BUILT_SOURCES = diag.c ${pname}-diag.h
+BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = \$(diags)
 CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #CLEANFILES += *.in
@@ -377,7 +377,7 @@ ${_LIB_HEADERS}
 
 ${canonical_pname}_SOURCES = $_MNAME
 nodist_${canonical_pname}_SOURCES = diag.c
-noinst_HEADERS = ${pname}-diag.h
+noinst_HEADERS = diag.h
 
 DEBUG_LD_FLAGS =
 if DEBUG
@@ -398,16 +398,15 @@ ${canonical_pname}_LDFLAGS =
 endif
 
 ${canonical_pname}_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-
 ${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -version-info @LIB${symbol_pname_upper}_ABI_VERSION@ -L\$(libdir)
 ${canonical_pname}_${_LIBLD} = -lmndiag
 #${canonical_pname}_${_LIBLD} += -lmrkcommon
 #${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static
 #${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
 
-diag.c ${pname}-diag.h: \$(diags)
-#	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H ${pname}-diag.h -C diag.c *.[ch]
-	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H ${pname}-diag.h -C diag.c *.[ch]
+diag.c diag.h: \$(diags)
+#	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
+	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H diag.h -C diag.c *.[ch]
 
 run: all
 	for i in \$(bin_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -417,7 +416,7 @@ testrun:
 EOD
 
 cat <<EOD >$pname/test/Makefile.am
-BUILT_SOURCES = diag.c ${pname}-diag.h
+BUILT_SOURCES = diag.c diag.h
 CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
@@ -488,9 +487,9 @@ gendata_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_
 gendata_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_GENDATA_LDFLAGS} -L\$(libdir)
 gendata_LDADD = -l${pname} -lmrkcommon -lmndiag
 
-diag.c ${pname}-diag.h: \$(diags)
-#	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H ${pname}-diag.h -C diag.c ../src/*.[ch] *.[ch]
-	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H ${pname}-diag.h -C diag.c ../src/*.[ch] *.[ch]
+diag.c diag.h: \$(diags)
+#	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c ../src/*.[ch] *.[ch]
+	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H diag.h -C diag.c ../src/*.[ch] *.[ch]
 
 testfoo-run: testfoo
 	@if test -x $>; \\
