@@ -1,7 +1,6 @@
 #include <assert.h>
 
-//#include <mrkcommon/unittest.h>
-#include "unittest.h"
+#include <mrkcommon/unittest.h>
 
 #ifndef NDEBUG
 const char *malloc_conf = "abort:true,junk:true,xmalloc:true";

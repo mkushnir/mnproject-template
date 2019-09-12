@@ -58,7 +58,7 @@ _gmake_v() {
 #
 # main
 #
-: ${MAKE:=make}
+: ${MAKE:='make'}
 if test "$MAKE" = gmake
 then
     _MAKE_V=_gmake_v
@@ -71,5 +71,5 @@ export _MAKE_V
 set -e
 all_sources="`_find_all_sources $@`"
 set +e
-all_sources="`echo $all_sources | xargs -n1 -I% echo % | sort -u`"
+all_sources="`echo $all_sources | xargs -n1 -I% echo % | grep '.*\.c$' | sort -u`"
 echo $all_sources

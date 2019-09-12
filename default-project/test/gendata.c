@@ -17,6 +17,8 @@
 #include <mrkcommon/dumpm.h>
 #include <mrkcommon/util.h>
 
+#include "diag.h"
+
 #ifndef NDEBUG
 const char *_malloc_options = "AJ";
 #endif

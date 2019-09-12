@@ -51,7 +51,14 @@ do_pre() {
 
 
 do_init() {
-    autoreconf --force || die fix your errors
+    autoreconf --force
+    if test $? -ne 0
+    then
+        if test -e .ac-aux/missing
+        then
+            die fix your errors
+        fi
+    fi
     aclocal
     autoheader
     autoreconf

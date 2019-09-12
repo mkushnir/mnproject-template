@@ -340,9 +340,9 @@ AC_OUTPUT
 EOD
 
 cat <<EOD >$pname/Makefile.am
-#SUBDIRS = $subdirs
+SUBDIRS = #$subdirs
 SUBDIRS += src man test
-#DIST_SUBDIRS = $subdirs
+DIST_SUBDIRS = #$subdirs
 DIST_SUBDIRS += src man test
 #CLEANFILES = *.in *.m4 *.log *.scan configure
 ACLOCAL_AMFLAGS = '-Im4'
@@ -400,9 +400,9 @@ endif
 ${canonical_pname}_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 ${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -version-info @LIB${symbol_pname_upper}_ABI_VERSION@ -L\$(libdir)
 ${canonical_pname}_${_LIBLD} = -lmndiag
-#${canonical_pname}_${_LIBLD} += -lmrkcommon
+${canonical_pname}_${_LIBLD} += -lmrkcommon
 #${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static
-#${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static -Wl,-Bdynamic,-L\$(libdir),-lfoo -lqwe,-Bstatic
+#${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static -Wl,-Bdynamic -L\$(libdir) -lfoo -lqwe -Wl,-Bstatic
 
 diag.c diag.h: \$(diags)
 #	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
@@ -470,7 +470,7 @@ testfoo_SOURCES = \$(lto_sources) testfoo.c
 testfoo_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 testfoo_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTFOO_LDFLAGS}
 testfoo_LDADD = -l${pname} -lmndiag
-#testfoo_LDADD += -lmrkcommon
+testfoo_LDADD += -lmrkcommon
 
 if CMOCKA
 testbar_SOURCES = \$(lto_sources) testbar.c
@@ -478,7 +478,7 @@ testbar_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_
 #testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag -lcmocka
 testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS}
 testbar_LDADD = -l${pname} -lmndiag -lcmocka
-#testbar_LDADD += -lmrkcommon
+testbar_LDADD += -lmrkcommon
 endif
 
 nodist_gendata_SOURCES = diag.c
