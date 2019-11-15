@@ -209,7 +209,7 @@ AC_CONFIG_SRCDIR([config.h.in])
 AC_CONFIG_HEADERS(config.h)
 dnl AC_CONFIG_SUBDIRS([$subdirs])
 echo "lto_sources =" > \${ac_pwd}/lto-sources.mk
-dnl echo "lto_sources += \`\${ac_pwd}/find-sources \${ac_pwd}/third-party/asd/src\`" >> \${ac_pwd}/lto-sources.mk
+dnl echo "lto_sources += \`\${ac_pwd}/tools-env/find-sources \${ac_pwd}/third-party/asd/src\`" >> \${ac_pwd}/lto-sources.mk
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile man/Makefile])
 
 
