@@ -1,0 +1,23 @@
+#!/bin/sh
+
+fname=$1
+
+if ! test -e "$fname"
+then
+    echo Missing $fname >&2
+    exit 1
+fi
+
+versions="`sed -n -E -e 's/^(AC_INIT\(\[[^]]+\][^[]+)(\[([0-9]+)\.([0-9]+)(\.([0-9]+))?\])(.*)$/\3 \4 \6/p' $fname`"
+if test -z "$versions"
+then
+    echo Missing INIT string >&2
+    exit 1
+fi
+echo $versions | while read maj min build; do
+    test -z $maj && maj=0
+    test -z $min && min=0
+    test -z $build && build=0
+    newversions="$maj.$min.`printf %03d $build`"
+    echo $newversions
+done
