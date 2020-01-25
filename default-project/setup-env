@@ -38,6 +38,10 @@
 #     test/testfoo.c \
 #     test/unittest.h
 
+_run() {
+    echo "running $@ ..."
+    eval "$@" >/dev/null 2>&1
+}
 
 die() {
     echo $*
@@ -51,7 +55,7 @@ do_pre() {
 
 
 do_init() {
-    autoreconf --force
+    _run autoreconf --force
     if test $? -ne 0
     then
         if test -e .ac-aux/missing
@@ -59,13 +63,13 @@ do_init() {
             die fix your errors
         fi
     fi
-    aclocal
-    autoheader
-    autoreconf
-    automake --add-missing
-    libtoolize
-    make distclean
-    autoreconf
+    _run aclocal
+    _run autoheader
+    _run autoreconf
+    _run automake --add-missing
+    _run libtoolize
+    _run make distclean
+    _run autoreconf
     ./configure --prefix=$HOME --enable-debug
 }
 
@@ -104,7 +108,7 @@ do_dev_ndebug_static() {
 #   - AC_CONFIG_SUBDIRS() macro in this project's configure.ac as well as
 #   - SUBDIRS and DIST_SUBDIRS in this project's top level Makefile.am
 
-#tpdirs="third-party/mndiag third-party/mrkcommon third-party/mrkl4c"
+#tpdirs="third-party/mndiag third-party/mncommon third-party/mnl4c"
 #tpdirs="third-party/asd"
 
 dirs=.

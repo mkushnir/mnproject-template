@@ -1,4 +1,4 @@
-mrkproject-template
+mnproject-template
 ===================
 
 Template for Markiyan's projects

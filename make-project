@@ -5,13 +5,7 @@ usage() {
     echo "`basename $0` -h"
 }
 
-type=prog
-_PTYPE=PROG
-_OWN=BINOWN
-_GRP=BINGRP
-_MNAME='foo.c main.c'
-_BSD=prog
-_SHLIB=
+type=lib
 _VERSIONINFO="0:0:0"
 force=0
 noinit=0
@@ -93,6 +87,7 @@ then
     canonical_pname="lib${pname}.la"
     _AM_PROG="lib_LTLIBRARIES = lib${pname}.la"
     _LIB_HEADERS="nobase_include_HEADERS = $pname.h"
+    _LIB_VERSION_INFO="-version-info @LIB${symbol_pname_upper}_ABI_VERSION@"
     _TEST_LIB_HEADERS="#noinst_HEADERS = ../src/$pname.h"
     _GENDATA_LDFLAGS="-L\$(top_srcdir)/src/.libs"
     _TESTFOO_LDFLAGS="-L\$(top_srcdir)/src/.libs"
@@ -128,9 +123,16 @@ extern "C" {
 EOD
     done
 else
+    _PTYPE=PROG
+    _OWN=BINOWN
+    _GRP=BINGRP
+    _MNAME='foo.c main.c'
+    _BSD=prog
+    _SHLIB=
     canonical_pname=$pname
     _AM_PROG="bin_PROGRAMS = $pname"
     _LIB_HEADERS="nobase_include_HEADERS ="
+    _LIB_VERSION_INFO=
     _TEST_LIB_HEADERS="#noinst_HEADERS ="
     _LIBLD=LDADD
 fi
@@ -167,8 +169,11 @@ CFLAGS+= -Wall -Wextra -Werror  -g
 CFLAGS+= -shared
 .endif
 
-SRCS=	$_MNAME diag.c
 diags=	diag.txt
+SRCS=	$_MNAME diag.c
+
+#diags=	logdef.txt
+#SRCS+= logdef.c
 
 SUBDIR=test
 
@@ -181,6 +186,9 @@ CPP=clang-cpp
 diag.c diag.h: \${diags}
 #	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
 	cat \$(diags) >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H diag.h -C diag.c *.[ch]
+
+logdef.c logdef.h: \$(logdefs)
+	l4cdefgen --lib $symbol_pname --hout logdef.h --cout logdef.c \$(logdefs)
 
 .include <bsd.$_BSD.mk>
 
@@ -263,18 +271,22 @@ AS_IF([test -n "\$USE_GCC"],
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 
-AS_CASE(["\$target_os"], [*linux*],
-    [AC_SUBST(_GNU_SOURCE_MACRO, ['-D_GNU_SOURCE'])],
-    [AC_SUBST(_GNU_SOURCE_MACRO)]
-)
 
-AS_CASE(["\$target_os"], [*darwin*],
+AS_CASE(["\$target_os"],
+    [*linux*],
     [
-     AC_SUBST(_XOPEN_SOURCE_MACRO, ['-D_XOPEN_SOURCE'])
+     AC_SUBST(_FEATURE_MACRO, ['-D_XOPEN_SOURCE'])
+     AC_SUBST(LIBTOOL_NO_INSTALL, ['-no-install'])
+    ],
+
+    [*darwin*],
+    [
+     AC_SUBST(_FEATURE_MACRO, ['-D_XOPEN_SOURCE'])
      AC_SUBST(LIBTOOL_NO_INSTALL, ['-no-fast-install'])
     ],
+
     [
-     AC_SUBST(_XOPEN_SOURCE_MACRO)
+     AC_SUBST(_FEATURE_MACRO)
      AC_SUBST(LIBTOOL_NO_INSTALL, ['-no-install'])
     ]
 )
@@ -340,7 +352,7 @@ AM_CONDITIONAL([FREEBSD], [echo \$build_os | grep freebsd >/dev/null])
 AM_CONDITIONAL([DARWIN], [echo \$build_os | grep darwin >/dev/null])
 
 #dnl pass LDFLAGS=-L\${LOCALBASE}/lib in the environment
-#AC_CHECK_LIB(mrkcommon, _fini, [], [AC_MSG_FAILURE(libmrkcommon.so is required. Please find it at git@github.com:mkushnir/mrkcommon.git)])
+#AC_CHECK_LIB(mncommon, _fini, [], [AC_MSG_FAILURE(libmncommon.so is required. Please find it at git@github.com:mkushnir/mncommon.git)])
 
 AC_OUTPUT
 EOD
@@ -375,6 +387,9 @@ BUILT_SOURCES = diag.c diag.h
 EXTRA_DIST = \$(diags)
 CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #CLEANFILES += *.in
+#logdefs = logdef.txt
+#BUILT_SOURCES += logdef.c logdef.h
+#EXTRA_DIST += \$(diags) \$(lofdefs)
 AM_MAKEFLAGS = -s
 
 ${_AM_PROG}
@@ -384,6 +399,8 @@ ${_LIB_HEADERS}
 ${canonical_pname}_SOURCES = $_MNAME
 nodist_${canonical_pname}_SOURCES = diag.c
 noinst_HEADERS = diag.h
+#nodist_${canonical_pname}_SOURCES += logdef.c
+#noinst_HEADERS += logdef.h
 
 DEBUG_LD_FLAGS =
 if DEBUG
@@ -403,16 +420,20 @@ else
 ${canonical_pname}_LDFLAGS =
 endif
 
-${canonical_pname}_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -version-info @LIB${symbol_pname_upper}_ABI_VERSION@ -L\$(libdir)
-${canonical_pname}_${_LIBLD} = -lmndiag
-${canonical_pname}_${_LIBLD} += -lmrkcommon
+${canonical_pname}_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_FEATURE_MACRO@ -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_LIB_VERSION_INFO} -L\$(libdir)
 #${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static
 #${canonical_pname}_LDFLAGS += \$(DEBUG_LD_FLAGS) -all-static -Wl,-Bdynamic -L\$(libdir) -lfoo -lqwe -Wl,-Bstatic
+${canonical_pname}_${_LIBLD} =
+#${canonical_pname}_${_LIBLD} += mnl4c
+${canonical_pname}_${_LIBLD} += -lmncommon -lmndiag
 
 diag.c diag.h: \$(diags)
 #	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c *.[ch]
 	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L global -H diag.h -C diag.c *.[ch]
+
+logdef.c logdef.h: \$(logdefs)
+	\$(AM_V_GEN) l4cdefgen --lib $symbol_pname --hout logdef.h --cout logdef.c \$(logdefs)
 
 run: all
 	for i in \$(bin_PROGRAMS); do if test -x ./\$\$i; then LD_LIBRARY_PATH=\$(libdir) ./\$\$i; fi; done;
@@ -473,25 +494,25 @@ endif
 
 nodist_testfoo_SOURCES = diag.c
 testfoo_SOURCES = \$(lto_sources) testfoo.c
-testfoo_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+testfoo_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_FEATURE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 testfoo_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTFOO_LDFLAGS}
 testfoo_LDADD = -l${pname} -lmndiag
-testfoo_LDADD += -lmrkcommon
+testfoo_LDADD += -lmncommon
 
 if CMOCKA
 testbar_SOURCES = \$(lto_sources) testbar.c
-testbar_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
-#testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmrkcommon -lmndiag -lcmocka
+testbar_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_FEATURE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+#testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS} -L\$(libdir) -lmncommon -lmndiag -lcmocka
 testbar_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_TESTBAR_LDFLAGS}
 testbar_LDADD = -l${pname} -lmndiag -lcmocka
-testbar_LDADD += -lmrkcommon
+testbar_LDADD += -lmncommon
 endif
 
 nodist_gendata_SOURCES = diag.c
 gendata_SOURCES = \$(lto_sources) gendata.c
-gendata_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_GNU_SOURCE_MACRO@ @_XOPEN_SOURCE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
+gendata_CFLAGS = \$(DEBUG_CC_FLAGS) -Wall -Wextra -Werror -std=c11 @_FEATURE_MACRO@ -I\$(top_srcdir)/test -I\$(top_srcdir)/src -I\$(top_srcdir) -I\$(includedir)
 gendata_LDFLAGS += \$(DEBUG_LD_FLAGS) ${_GENDATA_LDFLAGS} -L\$(libdir)
-gendata_LDADD = -l${pname} -lmrkcommon -lmndiag
+gendata_LDADD = -l${pname} -lmncommon -lmndiag
 
 diag.c diag.h: \$(diags)
 #	\$(AM_V_GEN) cat \$(diags) | sort -u >diag.txt.tmp && mndiagen -S diag.txt.tmp -L $symbol_pname -H diag.h -C diag.c ../src/*.[ch] *.[ch]
