@@ -365,6 +365,7 @@ DIST_SUBDIRS += src man test
 #CLEANFILES = *.in *.m4 *.log *.scan configure
 ACLOCAL_AMFLAGS = '-Im4'
 AM_MAKEFLAGS = -s
+AM_LIBTOOLFLAGS = --silent
 
 run:
 	for i in \$(SUBDIRS); do if test "\$\$i" != "."; then cd \$\$i && \$(MAKE) run && cd ..; fi; done;
@@ -391,6 +392,7 @@ CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #BUILT_SOURCES += logdef.c logdef.h
 #EXTRA_DIST += \$(diags) \$(lofdefs)
 AM_MAKEFLAGS = -s
+AM_LIBTOOLFLAGS = --silent
 
 ${_AM_PROG}
 
@@ -447,6 +449,7 @@ BUILT_SOURCES = diag.c diag.h
 CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #CLEANFILES += *.in
 AM_MAKEFLAGS = -s
+AM_LIBTOOLFLAGS = --silent
 
 # consider headers:
 #   - include_HEADERS
