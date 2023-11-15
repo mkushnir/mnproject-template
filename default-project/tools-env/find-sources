@@ -55,16 +55,57 @@ _gmake_v() {
 }
 
 
+_make_v() {
+    local _v
+    _v=$1
+    shift
+    eval make --eval "'_mn_qwe: ; @echo \$(${_v})'" $@
+}
+
+
+_make_p() {
+    local _v
+    _v=$1
+    shift
+    eval make -p $@ 2>/dev/null | grep "^${_v}"
+}
+
+
 #
 # main
 #
-: ${MAKE:='make'}
-if test "$MAKE" = gmake
+make -VQWE >/dev/null 2>&1
+if test $?  -eq 0
 then
-    _MAKE_V=_gmake_v
+    _MAKE_V="make -V"
 else
-    _MAKE_V="$MAKE -V"
+    make --eval "'_mn_qwe: ;'" >/dev/null 2>&1
+    if test $? -eq 0
+    then
+        if which gmake >/dev/null
+        then
+            _MAKE_V=_gmake_v
+        else
+            _MAKE_V=_make_v
+        fi
+    else
+        make -p >/dev/null 2>&1
+        if test $? -eq 0
+        then
+            _MAKE_V=_make_p
+        else
+            echo "cannot configure make -V, exiting ..."
+            exit 1
+        fi
+    fi
 fi
+
+# if test "$MAKE" = gmake
+# then
+#     _MAKE_V=_gmake_v
+# else
+#     _MAKE_V="$MAKE -V"
+# fi
 export _MAKE_V
 
 # All or nothing: set -e ... set +e
