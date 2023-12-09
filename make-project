@@ -390,7 +390,7 @@ CLEANFILES = \$(BUILT_SOURCES) *.core core diag.txt.tmp
 #CLEANFILES += *.in
 #logdefs = logdef.txt
 #BUILT_SOURCES += logdef.c logdef.h
-#EXTRA_DIST += \$(diags) \$(lofdefs)
+#EXTRA_DIST += \$(diags) \$(logdefs)
 AM_MAKEFLAGS = -s
 AM_LIBTOOLFLAGS = --silent
 
