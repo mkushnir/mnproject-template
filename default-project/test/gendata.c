@@ -71,7 +71,7 @@ myterm(UNUSED int sig)
 int
 main(UNUSED int argc, char **argv)
 {
-    char ch;
+    int ch;
 
 #ifdef HAVE_MALLOC_H
 #   ifndef NDEBUG
